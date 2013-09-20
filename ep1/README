@@ -1,0 +1,6 @@
+a interação na linha, coluna e região está funcionando perfeitamente.
+agora precisamos formatar a saida em um arquivo de saida sem o direcionamento do >>
+
+outra coisa que precisamos é inserir as dicas. Tenta fazer essas duas coisas e começa a escrever o relatório sobre essas duas partes, quando eu chegar amanhã eu testo com o minisat e interfaceio a resposta dele.
+
+lembrando que precisamos de um contador de variáveis e de clausulas, então o ideal é que a cada impressão fosse contado, ou houve-se uma contagem a priori, pq uma das primeiras informacoes que tem que conter no arquivo é a qnt de clausulas e a qnt de variaveis.

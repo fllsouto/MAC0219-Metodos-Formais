@@ -5,24 +5,29 @@ use nxnArray;
 use strict;
 use warnings;
 
-my @string = split(' ', <>);
-my $a;
+my @string = split(' ', <>);# nao precisa do aspas
 
 
 my $mat = new nxnArray();
+$mat->readInput(@string);
+$mat->printMatrix('sudoku');
+
+
+#####################################################################################
+#####################################################################################
+#####################################################################################
+
 # foreach $a (1..9){
 # 	$mat->createMatrix($a);
 # }
 
-# $mat->readInput(@string);
-
 # $mat->pointRmv();
 
-my $val1 = 0;
-my $val2 = 1;
-my $st = join('x', $val1,$val2);
-my $bye = $mat->retHash($st); 
-print ">> $bye \n";
+# my $val1 = 0;
+# my $val2 = 1;
+# my $st = join('x', $val1,$val2);
+# my $bye = $mat->retHash($st); 
+# print ">> $bye \n";
 #print "valor : $st\n";
 
 # $mat->horizontalRmv();

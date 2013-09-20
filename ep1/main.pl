@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use v5.12;
+use v5.10;
 use nxnArray;
 use strict;
 use warnings;
@@ -11,6 +11,9 @@ my @string = split(' ', <>);# nao precisa do aspas
 my $mat = new nxnArray();
 $mat->readInput(@string);
 $mat->printMatrix('sudoku');
+$mat->subSquare();
+$mat->highlanderLine();
+$mat->highlanderColumn();
 
 
 #####################################################################################

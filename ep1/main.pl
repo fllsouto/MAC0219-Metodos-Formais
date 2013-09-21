@@ -5,10 +5,21 @@ use nxnArray;
 use strict;
 use warnings;
 
-my @string = split(' ', <>);# nao precisa do aspas
+if(@ARGV < 2){
+   die "Uso:\n./main.pl <arquivoDeEntrada> <arquivoDeSaida>\n";
+}
+
+my $input = $ARGV[0];
+my $output = $ARGV[1];
+
+open INPUT, "< $input";
+open OUTPUT, "> $output";
+
+my @string = split(' ', <INPUT>);# nao precisa do aspas
 
 
 my $mat = new nxnArray();
+select OUTPUT;
 $mat->readInput(@string);
 $mat->insertTips();
 $mat->regionExistence();

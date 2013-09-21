@@ -183,7 +183,12 @@ sub columnExistence{
 
 sub squareExistence{
     my $self = shift;
-    
+    for(my $i = 1; $i < 729; $i++){
+	print $i." ";
+	if($i % 9 == 0){
+	    print "0\n";
+	}
+    }
 }
 
 

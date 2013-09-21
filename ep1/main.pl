@@ -11,6 +11,7 @@ my @string = split(' ', <>);# nao precisa do aspas
 my $mat = new nxnArray();
 print "c Sudoku\nc\np cnf 729 8748\n";
 $mat->readInput(@string);
+$mat->squareExistence();
 $mat->regionExistence();
 $mat->columnExistence();
 $mat->lineExistence();

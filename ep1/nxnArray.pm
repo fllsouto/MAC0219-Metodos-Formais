@@ -54,12 +54,12 @@ sub readInput{
 	#print "#$a($i , $j) $string[$a] X $self->{0}[$i][$j]\n";
     }
 
-#	for($a = 0; $a < 81; $a++,$j++){
-#		if (( my $ndx = $self->{input}[$a]) != 0){
-#			my $value = tipReturn($a, $ndx);
-#			print "$self->{input}[$a] -- ($ndx - $value) \n";
-#		}
-#	}
+    for($a = 0; $a < 81; $a++,$j++){
+	if (( my $ndx = $self->{input}[$a]) != 0){
+	    my $value = tipReturn($a, $ndx);
+	    print "$value 0\n";
+	}
+    }
 }
 #dado um a e um indx retorna sua equivalencia
 
@@ -71,7 +71,7 @@ sub tipReturn {
     return 9*$a +$indx;
 }
 
-sub subSquare {
+sub regionUniqueness{
     my $self = shift;
     use integer;
 
@@ -104,7 +104,25 @@ sub subSquare {
     }
 }
 
-sub highlanderLine {
+sub regionExistence{
+    my $self = shift;
+    use integer;
+    for(my $z = 0; $z < 9; $z++){
+	for(my $c = 0; $c < 9; $c++){
+	    my $l = $self->{centros}->[$c]->[0];
+	    my $k = $self->{centros}->[$c]->[1];
+	    for(my $p = -1; $p <= 1; $p++){
+		for(my $q = -1; $q <= 1; $q++){
+		    my $fixo = 9*($l+$p) + 81*($k+$q) + $z;
+		    print "".($fixo + 1)." ";
+		}
+		print "0\n";
+	    }
+	}
+    }
+}
+
+sub lineUniqueness {
     my $self = shift;
     for (my $z = 0; $z < 9; $z++) {
 	for (my $i = 0; $i < 9; $i++) {
@@ -118,10 +136,22 @@ sub highlanderLine {
 	    }
 	}
     }
-    
 }
 
-sub highlanderColumn {
+sub lineExistence{
+    my $self = shift;
+    for (my $z = 0; $z < 9; $z++) {
+	for (my $i = 0; $i < 9; $i++) {
+	    for (my $j = 0; $j < 9; $j++) {
+		my $fixo = 9*($j) + 81*($i) + $z;
+		print "".($fixo + 1)." ";
+	    }
+	    print "0\n";
+	}
+    }
+}
+
+sub columnUniqueness {
     my $self = shift;
     for (my $z = 0; $z < 9; $z++) {
 	for (my $j = 0; $j < 9; $j++) {
@@ -135,8 +165,23 @@ sub highlanderColumn {
 	    }
 	}
     }
-    
 }
+
+sub columnExistence{
+    my $self = shift;
+    for (my $z = 0; $z < 9; $z++) {
+	for (my $j = 0; $j < 9; $j++) {
+	    for (my $i = 0; $i < 9; $i++) {
+		my $fixo = 9*($j) + 81*($i) + $z; 
+		print "".($fixo + 1)." ";
+	    }
+	    print "0\n";
+	}
+    }
+}
+
+
+
 ####################################################################################
 ####################################################################################
 ####################################################################################

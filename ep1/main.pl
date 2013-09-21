@@ -11,11 +11,13 @@ my @string = split(' ', <>);# nao precisa do aspas
 my $mat = new nxnArray();
 $mat->readInput(@string);
 $mat->insertTips();
-#$mat->complementarTips();
-# $mat->permuteTips();
-# $mat->subSquare();
-# $mat->highlanderLine();
-# $mat->highlanderColumn();
+$mat->regionExistence();
+$mat->lineExistence();
+$mat->columnExistence();
+$mat->permuteTips();
+$mat->subSquare();
+$mat->highlanderLine();
+$mat->highlanderColumn();
 $mat->printFNC();
 
 #####################################################################################

@@ -125,10 +125,12 @@ sub insertClausule{
 sub printFNC{
 	my $self = shift;
 	print "c Sudoku\nc\np cnf 729 $self->{qntClausules}\n";
-	foreach my $key (keys $self->{FNC}) {
-		# print ">< $key == $self->{FNC}{$key} \n";
-		print "$key\n";
-	}
+    
+    my @clausulas = keys%{$self->{FNC}};
+    foreach my $key (@clausulas) {
+        # print ">< $key == $self->{FNC}{$key} \n";
+    	print "$key\n";
+    }
 }
 sub subSquare {
     my $self = shift;

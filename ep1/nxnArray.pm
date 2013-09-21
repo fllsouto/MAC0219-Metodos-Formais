@@ -116,8 +116,9 @@ sub regionExistence{
 		    my $fixo = 9*($l+$p) + 81*($k+$q) + $z;
 		    print "".($fixo + 1)." ";
 		}
-		print "0\n";
+		#print "0\n";
 	    }
+	    print "0\n";
 	}
     }
 }
@@ -178,6 +179,11 @@ sub columnExistence{
 	    print "0\n";
 	}
     }
+}
+
+sub squareExistence{
+    my $self = shift;
+    
 }
 
 

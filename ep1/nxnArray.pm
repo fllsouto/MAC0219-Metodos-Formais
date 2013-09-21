@@ -10,7 +10,9 @@ sub new{
     my $class = shift;
     my $self = {
 	sudoku => [],
+	FNC => {},
 	input => [],
+	qntClausules => 0,
 	centros => [[1,1],[1,4],[1,7],[4,1],[4,4],[4,7],[7,1],[7,4],[7,7]]
     };
 
@@ -46,20 +48,13 @@ sub readInput{
 
     use integer;
     for($a = 0; $a < 81; $a++,$j++){
-	if($j == 9){
-	    $j = 0;
-	    $i++;
-	}
-	$self->{sudoku}[$i][$j] = $string[$a];
-	#print "#$a($i , $j) $string[$a] X $self->{0}[$i][$j]\n";
+		if($j == 9){
+		    $j = 0;
+		    $i++;
+		}
+		$self->{sudoku}[$i][$j] = $string[$a];
     }
 
-#	for($a = 0; $a < 81; $a++,$j++){
-#		if (( my $ndx = $self->{input}[$a]) != 0){
-#			my $value = tipReturn($a, $ndx);
-#			print "$self->{input}[$a] -- ($ndx - $value) \n";
-#		}
-#	}
 }
 #dado um a e um indx retorna sua equivalencia
 
@@ -71,6 +66,70 @@ sub tipReturn {
     return 9*$a +$indx;
 }
 
+sub insertTips{
+	my $self = shift;
+	my $tipCounter = 0;
+	for (my $a = 0; $a < 81; $a++) {
+		if ($self->{input}[$a] != 0){
+			my $v = tipReturn($a,$self->{input}[$a]);
+			my $claus = $v." 0";
+			insertClausule($self,$claus);
+		}
+	}
+}
+
+sub permuteTips{
+	my $self = shift;
+	for (my $a = 0; $a < 81; $a++) {
+		for (my $b = 1; $b <= 9; $b++) {
+			for (my $c = $b + 1; $c <= 9; $c++) {
+				my $tip1 = tipReturn($a,$b);
+				my $tip2 = tipReturn($a,$c);
+				my $claus = "-".$tip1." -".$tip2." 0";
+				#print "* ($a,$b,$c) $tip1 -- $tip2\n";
+				insertClausule($self,$claus);
+			}
+			
+		}
+	}
+}
+
+sub complementarTips{
+	my $self = shift;
+	my $longClausule = undef;
+	for (my $a = 0; $a < 81; $a++) {
+		for (my $c = 1; $c <= 9; $c++) {
+			my $fixo = tipReturn($a,$self->{input}[$a]);
+			my $var = tipReturn($a,$c);
+			if ($fixo != $var){
+				$longClausule = $longClausule."$var ";
+			}
+
+		}
+	}
+	$longClausule = $longClausule." 0";
+	insertClausule($self,$longClausule);
+}
+
+sub insertClausule{
+	my $self = shift;
+	my $clausule = shift;
+	if (not (exists $self->{FNC}{$clausule})){
+		$self->{FNC}{$clausule} = 1;
+		$self->{qntClausules}++;
+	}
+
+
+}
+
+sub printFNC{
+	my $self = shift;
+	print "c Sudoku\nc\np cnf 729 $self->{qntClausules}\n";
+	foreach my $key (keys $self->{FNC}) {
+		# print ">< $key == $self->{FNC}{$key} \n";
+		print "$key\n";
+	}
+}
 sub subSquare {
     my $self = shift;
     use integer;
@@ -90,7 +149,9 @@ sub subSquare {
 			    #my $comb = $self->{sudoku}[$l+$m][$k+$n];
 			    my $comb = 9*($l+$m) + 81*($k+$n) +$z;
 			    if( ($m > $p) || ($m == $p && $n > $q) ){
-				print "-".($fixo+1)." -".($comb+1)." 0\n";
+			    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
+				insertClausule($self,$claus);
+				#print "-".($fixo+1)." -".($comb+1)." 0\n";
 				#print "".($fixo+1)." ".($comb+1)." 0\n";
 			    }
 			}	
@@ -112,7 +173,9 @@ sub highlanderLine {
 		my $fixo = 9*($j) + 81*($i) + $z; 
 		for (my $k = $j +1; $k < 9; $k++) {
 		    my $comb = 9*($k) + 81*($i) +$z;
-		    print "-".($fixo+1)." -".($comb+1)." 0\n";
+		    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
+			insertClausule($self,$claus);
+		    #print "-".($fixo+1)." -".($comb+1)." 0\n";
 		    #print "".($fixo+1)." ".($comb+1)." 0\n";
 		}
 	    }
@@ -129,7 +192,9 @@ sub highlanderColumn {
 		my $fixo = 9*($j) + 81*($i) + $z; 
 		for (my $k = $i +1; $k < 9; $k++) {
 		    my $comb = 9*($j) + 81*($k) +$z;
-		    print "-".($fixo+1)." -".($comb+1)." 0\n";
+		    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
+			insertClausule($self,$claus);
+		    #print "-".($fixo+1)." -".($comb+1)." 0\n";
 		    #print "".($fixo+1)." ".($comb+1)." 0\n";
 		}
 	    }

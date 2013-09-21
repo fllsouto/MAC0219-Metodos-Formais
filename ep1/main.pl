@@ -9,12 +9,14 @@ my @string = split(' ', <>);# nao precisa do aspas
 
 
 my $mat = new nxnArray();
-print "c Sudoku\nc\np cnf 729 8748\n";
 $mat->readInput(@string);
-$mat->subSquare();
-$mat->highlanderLine();
-$mat->highlanderColumn();
-
+$mat->insertTips();
+#$mat->complementarTips();
+# $mat->permuteTips();
+# $mat->subSquare();
+# $mat->highlanderLine();
+# $mat->highlanderColumn();
+$mat->printFNC();
 
 #####################################################################################
 #####################################################################################

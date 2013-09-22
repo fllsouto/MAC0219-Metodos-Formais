@@ -6,6 +6,7 @@ use warnings;
 
 package nxnArray;
 
+#Construtor da Classe
 sub new{
     my $class = shift;
     my $self = {
@@ -17,7 +18,6 @@ sub new{
     };
 
     bless $self, $class;
-    #print "Ins OK! \n";
     return $self;
 }
 
@@ -36,6 +36,7 @@ sub printMatrix{
     }
     print "\n";
 }
+
 #constroi o sudoku
 sub readInput{
     my $self = shift;
@@ -56,16 +57,15 @@ sub readInput{
     }
 
 }
+
 #dado um a e um indx retorna sua equivalencia
-
-
 sub tipReturn {
     my $a = shift;
     my $indx = shift;
 
     return 9*$a +$indx;
 }
-
+#Insere as Dicas
 sub insertTips{
 	my $self = shift;
 	my $tipCounter = 0;
@@ -77,7 +77,7 @@ sub insertTips{
 		}
 	}
 }
-
+#Permuta os candidatos de um quadrado
 sub permuteTips{
 	my $self = shift;
 	for (my $a = 0; $a < 81; $a++) {
@@ -86,31 +86,13 @@ sub permuteTips{
 				my $tip1 = tipReturn($a,$b);
 				my $tip2 = tipReturn($a,$c);
 				my $claus = "-".$tip1." -".$tip2." 0";
-				#print "* ($a,$b,$c) $tip1 -- $tip2\n";
 				insertClausule($self,$claus);
 			}
 			
 		}
 	}
 }
-
-sub complementarTips{
-	my $self = shift;
-	my $longClausule = undef;
-	for (my $a = 0; $a < 81; $a++) {
-		for (my $c = 1; $c <= 9; $c++) {
-			my $fixo = tipReturn($a,$self->{input}[$a]);
-			my $var = tipReturn($a,$c);
-			if ($fixo != $var){
-				$longClausule = $longClausule."$var ";
-			}
-
-		}
-	}
-	$longClausule = $longClausule." 0";
-	insertClausule($self,$longClausule);
-}
-
+#Insere as clausulas na tabela de hashing
 sub insertClausule{
 	my $self = shift;
 	my $clausule = shift;
@@ -118,93 +100,84 @@ sub insertClausule{
 		$self->{FNC}{$clausule} = 1;
 		$self->{qntClausules}++;
 	}
-
-
 }
-
+#Imprime as clausulas
 sub printFNC{
 	my $self = shift;
 	print "c Sudoku\nc\np cnf 729 $self->{qntClausules}\n";
 	my @clausules = keys % {$self->{FNC}};
 	foreach my $key (@clausules) {
-		# print ">< $key == $self->{FNC}{$key} \n";
 		print "$key\n";
 	}
 }
 
+#Metodo do subquadrado
 sub subSquare {
     my $self = shift;
     use integer;
 
     for (my $z = 0; $z < 9; $z++) {
 	
-	for(my $c = 0; $c < 9; $c++){
-	    my $l = $self->{centros}->[$c]->[0];
-	    my $k = $self->{centros}->[$c]->[1];
+		for(my $c = 0; $c < 9; $c++){
+		    my $l = $self->{centros}->[$c]->[0];
+		    my $k = $self->{centros}->[$c]->[1];
 
-	    for(my $p = -1; $p <= 1; $p++){
-		for(my $q = -1; $q <= 1; $q++){
-		    #my $fixo = $self->{sudoku}[$l+$p][$k+$q];
-		    my $fixo = 9*($l+$p) + 81*($k+$q) + $z;
-		    for(my $m = -1; $m <= 1; $m++){
-			for(my $n = -1; $n <= 1; $n++){		
-			    #my $comb = $self->{sudoku}[$l+$m][$k+$n];
-			    my $comb = 9*($l+$m) + 81*($k+$n) +$z;
-			    if( ($m > $p) || ($m == $p && $n > $q) ){
-			    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
-				insertClausule($self,$claus);
-				#print "-".($fixo+1)." -".($comb+1)." 0\n";
-				#print "".($fixo+1)." ".($comb+1)." 0\n";
-			    }
-			}	
-		    }	
-		    
+		    for(my $p = -1; $p <= 1; $p++){
+				for(my $q = -1; $q <= 1; $q++){
+				    my $fixo = 9*($l+$p) + 81*($k+$q) + $z;
+				    for(my $m = -1; $m <= 1; $m++){
+						for(my $n = -1; $n <= 1; $n++){		
+						    my $comb = 9*($l+$m) + 81*($k+$n) +$z;
+						    if( ($m > $p) || ($m == $p && $n > $q) ){
+							    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
+								insertClausule($self,$claus);
+
+							}
+						}	
+				    }	
+				    
+				}
+
+		    }
 		}
-
-	    }
-	}
 
     }
 }
-
+#Metodo das linhas
 sub highlanderLine {
     my $self = shift;
     for (my $z = 0; $z < 9; $z++) {
 	for (my $i = 0; $i < 9; $i++) {
 	    for (my $j = 0; $j < 9; $j++) {
-		my $fixo = 9*($j) + 81*($i) + $z; 
-		for (my $k = $j +1; $k < 9; $k++) {
-		    my $comb = 9*($k) + 81*($i) +$z;
-		    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
-			insertClausule($self,$claus);
-		    #print "-".($fixo+1)." -".($comb+1)." 0\n";
-		    #print "".($fixo+1)." ".($comb+1)." 0\n";
-		}
+			my $fixo = 9*($j) + 81*($i) + $z; 
+			for (my $k = $j +1; $k < 9; $k++) {
+			    my $comb = 9*($k) + 81*($i) +$z;
+			    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
+				insertClausule($self,$claus);
+			}
 	    }
 	}
     }
     
 }
-
+#Metodo das colunas
 sub highlanderColumn {
     my $self = shift;
     for (my $z = 0; $z < 9; $z++) {
 	for (my $j = 0; $j < 9; $j++) {
 	    for (my $i = 0; $i < 9; $i++) {
-		my $fixo = 9*($j) + 81*($i) + $z; 
-		for (my $k = $i +1; $k < 9; $k++) {
-		    my $comb = 9*($j) + 81*($k) +$z;
-		    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
-			insertClausule($self,$claus);
-		    #print "-".($fixo+1)." -".($comb+1)." 0\n";
-		    #print "".($fixo+1)." ".($comb+1)." 0\n";
-		}
+			my $fixo = 9*($j) + 81*($i) + $z; 
+			for (my $k = $i +1; $k < 9; $k++) {
+			    my $comb = 9*($j) + 81*($k) +$z;
+			    my $claus = "-".($fixo+1)." -".($comb+1)." 0";
+				insertClausule($self,$claus);
+			}
 	    }
 	}
     }
     
 }
-
+#Existencia das colunas
 sub columnExistence{
     my $self = shift;
     my $longClausule = undef;
@@ -215,13 +188,12 @@ sub columnExistence{
 				$longClausule = $longClausule."$fixo ";
 			}
 			$longClausule = $longClausule." 0";
-			# print ">> $longClausule \n";
 		    insertClausule($self,$longClausule);
 		    $longClausule = undef;
 		}
     }
 }
-
+#Existencia das regioes
 sub regionExistence{
     my $self = shift;
     my $longClausule = 	undef;
@@ -243,7 +215,7 @@ sub regionExistence{
 		}
     }
 }
-
+#Existencia das linhas
 sub lineExistence{
     my $self = shift;
     my $longClausule = undef;

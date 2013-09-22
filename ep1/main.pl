@@ -35,32 +35,13 @@ $mat->printFNC();
 
 close OUTPUT;
 
-`./minisat $output $answer`;
-system('./filtro.pl '.$answer);
-
-#####################################################################################
-#####################################################################################
-#####################################################################################
-
-# foreach $a (1..9){
-# 	$mat->createMatrix($a);
-# }
-
-# $mat->pointRmv();
-
-# my $val1 = 0;
-# my $val2 = 1;
-# my $st = join('x', $val1,$val2);
-# my $bye = $mat->retHash($st); 
-# print ">> $bye \n";
-#print "valor : $st\n";
-
-# $mat->horizontalRmv();
-# $mat->verticalRmv();
-# $mat->zoneRmv(1,2);
-# foreach $a (0..9){
-# 	$mat->printMatrix($a);
-# }
+if(`/.minisat $output $answer`){
+	system('./filtro.pl '.$answer);
+}
+else{
+	`minisat $output $answer`;
+	system('./filtro.pl '.$answer);
+};
 
 
 

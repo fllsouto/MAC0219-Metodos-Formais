@@ -21,10 +21,6 @@ for (my $a = 1; $a < scalar @string; $a++) {
 
 }
 
-# for (my $a = 0; $a < scalar @string2; $a++) {
-# 	print "$string2[$a] \n";
-# }
-
 readInput(@string2);
 
 

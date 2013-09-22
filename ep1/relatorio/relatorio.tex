@@ -2,25 +2,25 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+
 \usepackage[brazil]{babel}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage[colorinlistoftodos]{todonotes}
 
-\title{Relatório Exercício Programa I - Batalha de Robôs}
+\title{Relatório Exercício Programa I - Sudoku}
 \author{
 Fellipe Souto Sampaio \footnote{Número USP: 7990422 e-mail: fellipe.sampaio@usp.com}\\
 Gervásio Protásio dos Santos Neto \footnote{Número USP: 7990996 e-mail: gervasio.neto@usp.br}\\
-Vinícius Jorge Vendramini \footnote{Número USP: 7991103 e-mail: vinicius.vendramini@usp.br}
 }
 
 \begin{document}
 \maketitle
 
 \begin{center}
-MAC 0242 Laboratório de Programa\c{c}ão II \\
-Prof. Marco Dimas Gubitoso \\
+MAC 0239 Métodos Formais em Programação \\
+Prof. Marcelo Finger \\
              
 \end{center}
 
@@ -33,118 +33,259 @@ Instituto de Matemática e Estatística - IME USP \\
 \newpage
 
 \section{Introdução}
-Este relatório pretende explicar a implementação do exercício programa I detalhando seu funcionamento, o projeto de suas classes e seus objetos.\\\\
-Detalharemos a forma de implementação e manuseio da pilha e sua relação com o módulo operação, e o uso das expressões regulares para o processamento da entrada de dados.
+Este relatório pretende explicar a implementação do exercício programa I, explicando desde modelagem do problema a implementação do programa o descreve. A proposta do exercício é desenvolver um programa que descreva um jogo sudoku através de uma \textit{Formula Normal Conjuntiva} e resolver um dado jogo fornecido pelo usuário, devolvendo uma resposta que o satisfaz. 
 
-\section{Expressões Regulares}
+\section{Modelo do Sudoku}
+O sudoku modelado é de ordem 3 (9x9), começemos delimitando quais são as regras que cada quadrado da grade deve respeitar, que são as seguintes:
 
-Para processamento do arquivo-fonte contendo o prorama a ser interpretado foram utilizadas expressões regulares do Perl.\\\\
-Usou-se o operador diamante (<>) dentro de um loop while para ler a entrada até o final e a cada linha da entrada viu-se se ela se conformava com o esperado de uma linha de código.\\\\
-Mais especificamente, a seguinte expressões regulares aparecem em nossa implementação do processador de texto:
-\begin{lstlisting}[frame=single]
- /^#.*[\n\f]*/ #verifica se se trata de um comentario
- 
- /(\b[a-zA-Z]*\b:\s*)[\n\f#]*$/ #identifica uma linha
-				# so com label
-                
- /(\b[a-zA-Z]*\b:\s*)?(\b[a-zA-Z]{2,4}\b[^:]?)
- (\w*)\s*[\n\f#]*/ #identifica uma linha executavel
- 
+\begin{enumerate}
+\item[•]{Na linha cada quadrado deve possuir apenas 1 número entre 1 a 9, de forma que todos os números da linha sejam distintos entre sí.}
+\item[•]{Na coluna cada quadrado deve possuir apenas 1 número entre 1 a 9, de forma que todos os números da coluna sejam distintos entre sí.}
+\item[•]{Em cada região 3x3 todo quadrado deve possuir apenas 1 número entre 1 a 9, de forma que todos os números da linha sejam distintos entre sí.}
+\item[•]{Em cada quadrado pode-se colocar apenas 1 número, sendo este de 0 a 9.}
+\end{enumerate}
 
-\end{lstlisting}
-Durante o processamento do textos, dependendo do que foi capturado pela expressão regular, realiza-se um comando:
+Admitindo as regras enumeradas acima como "axiomas" para construção de um sudoku, podemos enumerar algumas consequências dessas definições:
 
-\begin{itemize}
-\item Comentário: Linhas de comentário e comentários em linhas válidas são ignorados.
-\item Label: caso a label seja uma string válida (não é um undef), ela é inserida em um hash na stack (uma instância da classe pilha, detalhado mais a frente). A label é usada como key do hash, o valor guardado é a posição do programa marcada pelo label.
-\item Comandos: Ao identificar um par ordenado (comando,argumento) é criada uma referência anônima para esse par que é então inserido no vetor de instruções.
-\end{itemize}
+\begin{enumerate}
+\item[•]{Os números estarão dispostos em linhas, colunas e regiões através da re-presentação de apenas um elemento por quadrado.}
+\item[•]{Um quadrado nunca pode receber mais que um elemento.}
+\item[•]{Um sudoku com dicas restringe a quantidade de candidatos possíveis para um dado quadrado.}
+\end{enumerate}
 
-\section{Vetor de Instruções}
+Com todas essas regras de construção a modelagem do problema através de uma \textit{Formula Normal Conjuntiva} torna-se extremamente útil. Na modelagem proposta teremos as seguintes definições:
 
-O vetor de instruções é uma estrura de dados que contém a sequência dos comandos que devem ser executados, acompanhados de seus respectivos argumentos.\\\\
-Sempre que é encontrada uma instrução válida, ela e seu argumentos são inseridos em um vetor anônimo, e este então é inserido no vetor de instruções.\\\\
-Durante o laço de execução das instruções o vetor é percorrido e seu conteúdo (os comandos) são interpretardos pelo método \textit{makeOperation}, pretencente a classe pilha. \\\\
-Com execessão de quando é executado um pulo (JMP), a leitura do vetor é linear, como a sua posição atual (o Program Counter) sendo um atributo da pilha.
+\begin{enumerate}
+\item[•]{Existem 729 variáveis, sendo um grupo de nove valores possíveis para cada um dos 81 quadrados.}
+\item[•]{Admitiu-se contar de 1 a 729 as variáveis, sempre no sentido da esquerda para direita e de cima para baixo.}
+\item[•]{Um sudoku com dicas restringe a quantidade de candidatos possíveis para um dado quadrado.}
+\end{enumerate}
 
-\section{Pilha de Dados}
-Na implementação de uma máquina virtual o elemento principal é a pilha de dados. Em nosso programa foi criado a classe pilha, um objeto munido de operações usuáis, como empilhar, desempilhar, devolver o topo, duplicar entre outros. Todas estas operações são aplicadas diretamente na pilha, independente do tipo de dado empilhado.\\\\
-O método principal de operação da pilha é chamado \textit{makeOperation}, no qual a instrução a ser executada é recebida, testada se é válida e se está presente no hashing de instruções, em caso positivo o conteudo é uma referência para qual médoto deve ser aplicado (saltos, empilhamento, comparação lógica do conteúdo, descarte, impressão ...). No segundo caso, negativo, é verificado se a instrução é chave do hashing do objeto operation.
-
-\section{Operações Lógicas e Aritméticas}
-Neste módulo está a classe operation, responsável pelas operações lógicas e aritméticas entre elementos da pilha. Caso a operação requisitada exista esta é aplicada aos elementos que foram desempilhados da pilha. O valor final da operação binária é devolvido para que seja empilhado. Semelhante a implementação da classe stack,o hashing das operações tem como conteúdo referências para as funções que devem ser aplicadas.
-
-\section{Integração}
-Na execução do projeto procurou-se ao máximo atender a um projeto de orientação a objeto.\\\\
-Os módulos stack e operations regimentam a execução. Na classe pilha um de seus atributos é um objeto operation.\\\\
-É no módulo stack que são chamadas (por meio de referências anônimas) as funcções responsáveis pela execução de operações. Primeiro checa-se se a operação a ser realizada é uma operação de pilha; se for, é realizada. Cado contrário a operação requisitada não é uma manipulação usual, e sim uma operação lógico-aritmética sobre seus elementos, e para isso invoca-se a função pertinente do operations por meio do objeto previamente instanciando.\\\\
-Por fim o readSource executa um loop (um ciclo Fetch, Decode, Execute - FDX), chamando as funções da pilha que processam comandos por meio de um objeto to tipo stack. O loop rodará até o final  do vetor de instruções ou encontrar-se o comando END.\\\\
+\section{Implementação do Modelador}
+O modelador foi escrito na linguagem de programação Perl, por sua praticidade em lidar com listas e tabelas de hashing. O arquivo principal que modela o sudoku é o módulo nxnArray.pm. Neste módulo está declarado a classe de mesmo nome do arquivo, a qual possui como atributos :
+\begin{enumerate}
+\item[•]{Sudoku - Uma matriz 9x9 que guarda o sudoku não resolvido.}
+\item[•]{Input - Um array com a entrada fornecida pelo usuário.}
+\item[•]{FNC - Uma tabela de hashing, no qual suas chaves são todas as cláusulas que compõem a FNC.}
+\item[•]{QntClausules - Um contador de quantas cláusulas são criadas ao longo do programa.}
+\item[•]{Centros - A coordenada do quadrado central de todas as 9 regiões do sudoku.}
+\end{enumerate}
 
 
-\section {\textbf{\text{\Large  Anexo - Códigos Testados}}}
+As cláusulas serão escritas no arquivo de saida utilizando 8 métodos diferentes, nos quais cada um irá modelar um tipo de restrição.
 
-\title{\large Sequencia de Fibonacci}
-\begin{lstlisting}[frame=single]
-PUSH 1
-PUSH 0
-STO 0
-STO 1
-PUSH 20
-STO 2
-LOOP: 
-RCL 0
-RCL 1
-DUP
-STO 0
-ADD
-DUP
-STO 1
-PRN
-RCL 2
-PUSH 1
-SUB
-DUP
-STO 2
-PUSH 0
-EQ
-JIF LOOP
-END
-\end{lstlisting}
+Nos métodos \textit {highlanderColumn, highlanderLine e subSquare} cada variável atômica será combinada dois-a-dois com todas as outras representante de um dado número. Esta combinação impede que exista mais de um representante de um número em uma mesma região, linha e coluna. Tem-se o seguinte exemplo para ilustrar a ideia:
 
 
-\title{\large Potências de 2}
-\begin{lstlisting}[frame=single]
-# inicializa
-PUSH 1
-STO 0
-PUSH 10000000
-STO 1
+Seja $X_{1,1}$ \dots $X_{1,9}$ todas as variáveis que representam um X $\in$ $[1 \dots 9]$, as cláusulas serão da forma:\\
+$\neg X_{1,1}$  V  $\neg X_{1,2}$\\
+$\neg X_{1,1}$  V  $\neg X_{1,3}$\\
+\vdots \\
+$\neg X_{1,1}$  V  $\neg X_{1,9}$\\
+$\neg X_{1,2}$  V  $\neg X_{1,3}$\\
+\vdots
+$\neg X_{1,2}$  V  $\neg X_{1,9}$\\
+\vdots\\
+$\neg X_{1,8}$  V  $\neg X_{1,9}$\\
+$\neg X_{2,1}$  V  $\neg X_{2,2}$\\
+\vdots\\
+$\neg X_{2,1}$  V  $\neg X_{2,9}$\\
+\vdots\\
+$\neg X_{9,1}$  V  $\neg X_{9,2}$\\
+\vdots\\
+$\neg X_{9,1}$  V  $\neg X_{9,9}$\\
+\vdots\\
+$\neg X_{9,8}$  V  $\neg X_{9,9}$\\
 
-LOOP: POP 
-RCL 0
-DUP
-ADD
-STO 0
-RCL 0
-PRN
-RCL 0
-RCL 1
-LT
-JIF	LOOP
+Cada combinação em um dado X $\in$ $[1 \dots 9]$ gera um total de 36 cláusulas e 324 para cada número, repetindo isso para cada linha, coluna ou subquadrado tem-se um total de 2916, por fim juntando os três casos, 8748 cláusulas.
 
-END
-\end{lstlisting}
+\subsection{Algoritmo Para Linhas e Colunas}
+O algoritmo para escrita das cláusulas de linhas e colunas funciona sobre uma matriz unidade (9x9) A*z, onde z varia em $\in$ $[1 \dots 9]$. A permutação citada é realizada fixando um elemento $X_{i,j}$ e interando outro $Y_{i+k,j+l}$ dependendo do caso. Para recuperar o átomo correspondente da cláusula é utilizada a seguinte relação:
+
+\begin{center}
+$9\times j + 81\times i + z$\\
+\end{center}, onde o par (i,j) será a coordenada da matriz e z o coeficiente multiplicatório de A. Tem-se como exemplo:\\
+$\neg 1$  V  $\neg 10$\\
+$\neg 1$  V  $\neg 19$\\
+\vdots \\
+$\neg 1$  V  $\neg 73$\\
+$\neg 2$  V  $\neg 11$\\
+\vdots\\
+$\neg 2$  V  $\neg 74$\\
+\vdots
+
+
+\subsection{Algoritmo Para Região}
+O método \textit{subsquate} é responsável por construir as cláusulas que forçam a unicidade dos números nas regiões 3x3.\\\\
+O que fazemos é que usamos os centros das regiões (armazenados previamente como um atributo da classe) para percorrer a região. Já que sabiamos o centro \textit{(l,k)}, os pontos da região seriam \{ (\textit{l $\pm$ q, k $\pm$ p}) | $q, p \in$ [-1,\dots,1] \}.\\\\
+De posse de tal informação e da fórmula mencionada na Seção 3.1 fomos capazes de construir, de forma similar a como fizemos para linhas e colunas, as cláusulas das regiões.\\\\
+Por exemplo, na primeira região, as clásulas que forçam que cada região possa conter o número 1 apenas umas vez seriam as seguintes:\\\\
+$\neg 1$  V  $\neg 82$\\
+$\neg 1$  V  $\neg 163$\\
+$\neg 1$  V  $\neg 10$\\
+$\neg 1$  V  $\neg 91$\\
+$\neg 1$  V  $\neg 172$\\
+$\neg 1$  V  $\neg 19$\\
+$\neg 1$  V  $\neg 100$\\
+$\neg 1$  V  $\neg 181$\\
+
+
+
+\subsection{Algoritmo da Permutação dos candidatos}
+Cada quadrado pode conter um X $\in [1 \dots 9]$, e caso este X tenha um valor delimitado todos os outros candidatos serão falsos. Para isso utiliza-se a mesma ideia de permutação dois-a-dois, só que neste caso entre os candidatos de um dado quadrado. Por exemplo:
+
+Seja $Q_{1,1}$ o quadrado de coordenada (1,1), as cláusulas de seus prováveis candidatos são da forma:\\
+$\neg 1$  V  $\neg 2$\\
+$\neg 1$  V  $\neg 3$\\
+\vdots \\
+$\neg 1$  V  $\neg 9$\\
+$\neg 2$  V  $\neg 3$\\
+\vdots\\
+$\neg 2$  V  $\neg 9$\\
+\vdots\\
+$\neg 8$  V  $\neg 9$\\
+
+Pelas cláusulas acima se $Q_{1,1}$ receber o valor 1, todos os outros candidatos devem receber 0, para que a cláusula continue sendo verdadeira.
+
+
+
+
+\subsection{Algoritmos para Existência de Números}
+Os algoritmos descritos até este pontos garantem apenas que exitem \textit{no máximo} um número de cada tipo em cada linha, região e coluna e que não se atribua a um mesmo quadrado números distintos. Contudo, se tivessemos apenas essas cláusulas, um sudoku vazio seria uma resposta válida.\\\\
+Isso ocorre pois essas cláusulas não forçam que haja \textit{pelo menos um} de cada número em cada linha, coluna ou região. E foi para contornar este problema, desenvolvemos os métodos \textit{columnExistence, lineExistence} e \textit{regionExistence}.\\\\
+Seu funcionamento é similar ao dos algoritmos que garantem a unicidade, contudo, ao invés de construírmos fórmular dois a dois, criamos, cláusulas que forçam o aparecimento de um número.\\\\
+Por exemplo, o método \textit{lineExistence} teria como uma das cláusulas de seu output a seguinte fórmula:\\
+
+1 V 10 V 19 V 28 V V 37 V 46 V 55 V 64 V 73\\\\
+Que significa que ao menos um destes átomos precisa ser verdade. Como estes átomos representam a existência do número 1 na primeira linha, o que essa fórmula diz essencialemte é que a primeira linha deve conter o número 1 ao menos uma vez.\\\\
+As cláusulas geradas por estes métodos, combinadas com as geradas pelos métodos descritos anteriormente garantem que cada número aparece uma vez, e somente uma vez.
+
+\subsection{Inserção das Dicas}
+Após a construção do modelo para um sudoku abstrato o método \textit{insertTips} realiza a tarefa de inserir as dicas do sudoku fornecido pelo usuário. Através da inserção das dicas o resolvedor SAT é forçado a fornecer uma valoração que respeite estas delimitações
+
+\section{Interface Modelador-minisat}
+O módulo \textit{nxnArray.pm} contém os métodos geradores das cláusulas em formato CNF DIMACS que, quando processados pelo SAT-SOLVER (no nosso caso, foi usado o minisat), produzirá uma uma resposta para o Sudoku.\\\\
+Além deste módulo, utilizamos mais dois arquivos: \textit{main.pl} e \textit{filtro.pl}.\\\\
+O aqruivo \textit{filtro.pl} recebe com entrada um arquivo que contém a saída do minisat (ou seja, um arquivo que contém a valoração que constitui uma resposta para o problema dado), processa este arquivo e imprime na saída padrão o sudoku resolvido com a valoração produzida pelo minisat.\\\\
+Lembramos que para gerar um arquivo com a valoração utilizando o minisat basta executar:
+\begin{verbatim}
+./minisat <arquivoCNF> <arquivoDeSaida>
+\end{verbatim}
+Já \textit{main.pl} é arquivo principal do EP, sendo o programa que dá o output \textit{de facto} do programa e é melhor descrito na Seção 5 - Integração e Funcionamento.
+
+\section{Integração e Funcionamento}
+Todos os códigos-fonte em Perl são conectados por meio do arquivo \textit{main.pl}. Ele deve ser invocado da seguinte forma:
+\begin{verbatim}
+./main.pl <arquivoComSudoku> <nomeDoCNF> <nomeDaSaidaDoMinisat> 
+\end{verbatim}
+O arquivo com a configuração do sudoku já deve existir no diretorio em que \textit{main.pl} está sendo invocado. O arquivo .cnf, bem como o arquivo de saída do minisat, serão criados durante a execução de \textit{main.pl} e continuarão no diretório, podendo ser reutilizados. Vale lembrar que \textit{main.pl} e o executável do minisat (que deve chamar-se minisat) devem estar no mesmo diretório para que a execução aconteça corretamente.\\\\
+Nele instanciamos o módulo \textit{nxnArray.pm} e utilizamos os métodos deste para ler a entrada contendo a configuração do Sudoku e escrever as cláusulas pertinentes (descritas em seções anteriores) em um arquivo .cnf . Para esta escrita utilizamos dois \textit{Filehandles}, INPUT e OUTPUT.\\\\
+INPUT é o arquivo de entrada, que será lido e modelado. Já OUTPUT referencia o arquivo .cnf, no qual serão escritas as cláusulas.\\\\
+Uma vez que terminamos de escrever as clásulas, usamos a funcionalidade de aspas invertidas do Perl (``) para executarmos um comando bash. Nesse caso, o comando executado é:
+\begin{verbatim}
+./minisat $output $answer
+\end{verbatim}
+Onde \$output guarda o nome do arquivo .cnf e \$answer é o nomoe do arquivo em que o minisat escreverá uma valoração que satisfaz as cláusulas para o Sudoku modelado.\\\\
+Por fim, usamos o comando system() do Perl que, similarmente as aspas invertidas, executa um comando bash, mas que permite envio de informação para a saída padrão. Utilizando esse comando, invocamos o seguinte script:
+\begin{verbatim}
+./filtro.pl $answer
+\end{verbatim}
+Ou seja, passamos como argumento de \textit{filtro.pl} o arquivo de saída do minisat. O resultado é que no STDOUT é então impresso o Sudoku resolvido, conforme o funcionamento de \textit{filtro.pl}.\\\\
+O resultado final da evocação de \textit{main.pl} é um arquivo .cnf que contém as cláusulas que modelam o Sudoku de entrada, um arquivo contendo a saída do minisat e, na sáida padrão, o Sudoku resolvido.
+
+
 \newpage
-\title{\large A resposta para a pergunta fundamental da vida, universo e tudo mais}
-\begin{lstlisting}[frame=single]
-PUSH 10
-PUSH 4
-ADD
-PUSH 3
-MUL
-PRN
-END
+\section{Conclusão e Exemplos Testados}
+Através da modelagem do sudoku via FNC foi possível criar um método para simular seu comportamento e uma maneira viável e rápida para resolver um dado sudoku. Em testes realizados a performace do programa demonstrou-se muito satisfatória. Podemos citar como exemplos testados os seguintes:\\
 
-\end{lstlisting}
+\begin{center}
+\title{\large Entrada}\\
+5 3 0 0 7 0 0 0 0 \\
+6 0 0 1 9 5 0 0 0 \\
+0 9 8 0 0 0 0 6 0 \\
+8 0 0 0 6 0 0 0 3 \\
+4 0 0 8 0 3 0 0 1 \\
+7 0 0 0 2 0 0 0 6 \\
+0 6 0 0 0 0 2 8 0 \\
+0 0 0 4 1 9 0 0 5 \\
+0 0 0 0 8 0 0 7 9 \\
+\end{center}
+\begin{center}
+\title{\large Problem Statistics}\\
+
+\end{center}
+Number of variables:           729 \\
+Number of clauses:            5759\\
+Parse time:                   0.01 s\\
+restarts              : 1
+conflicts             : 0              (0 /sec)\\
+decisions             : 1              (0.00 \% random) (125 /sec)\\
+propagations          : 729            (91125 /sec)\\
+conflict literals     : 0              (-nan \% deleted)\\
+Memory used           : 21.00 MB\\
+CPU time              : 0.008 s\\
+SATISFIABLE\\
+
+
+\begin{center}
+\title{\large Saida}\\
+5  3  4  6  7  8  9  1  2  \\
+6  7  2  1  9  5  3  4  8  \\
+1  9  8  3  4  2  5  6  7  \\
+8  5  9  7  6  1  4  2  3  \\
+4  2  6  8  5  3  7  9  1  \\
+7  1  3  9  2  4  8  5  6  \\
+9  6  1  5  3  7  2  8  4  \\
+2  8  7  4  1  9  6  3  5  \\
+3  4  5  2  8  6  1  7  9  \\
+\end{center}
+
+\newpage
+
+\begin{center}
+\title{\large Entrada}\\
+8  0  0  0  0  0  0  0  0  \\
+0  0  3  6  0  0  0  0  0  \\
+0  7  0  0  9  0  2  0  0  \\
+0  5  0  0  0  7  0  0  0  \\
+0  0  0  0  4  5  7  0  0  \\
+0  0  0  1  0  0  0  3  0  \\
+0  0  1  0  0  0  0  6  8  \\
+0  0  8  5  0  0  0  1  0  \\
+0  9  0  0  0  0  4  0  0  \\
+\end{center}
+\begin{center}
+\title{\large Problem Statistics}\\
+
+\end{center}
+Number of variables:           729 \\
+Number of clauses:           7421 \\
+Parse time:                   0.01 s\\
+Simplification time:          0.00 s 
+restarts              : 1
+conflicts             : 93             (7750 /sec)\\
+decisions             : 113            (0.00 \% random) (9417 /sec)\\
+propagations          : 7123           (593583 /sec)\\
+conflict literals     : 722            (12.17 \% deleted)\\
+Memory used           : 22.00 MB\\
+CPU time              : 0.012 s\\
+SATISFIABLE\\
+
+\begin{center}
+\title{\large Saida}\\
+8  1  2  7  5  3  6  4  9  \\
+9  4  3  6  8  2  1  7  5  \\
+6  7  5  4  9  1  2  8  3  \\
+1  5  4  2  3  7  8  9  6  \\
+3  6  9  8  4  5  7  2  1  \\
+2  8  7  1  6  9  5  3  4  \\
+5  2  1  9  7  4  3  6  8  \\
+4  3  8  5  2  6  9  1  7  \\
+7  9  6  3  1  8  4  5  2  \\
+\end{center}
+
+Obs: Na maioria dos sudokus presente em jornais e revistas é atribuido um nível de dificuldade de 1 até 5 estrela, ou seja, do mais fácil ao mais difícil. O sudoku acima foi criado pelo matemático finlandês Arto Inkala, e pela classificação usual teria onze estrelas.
+
+
 
 \end{document}

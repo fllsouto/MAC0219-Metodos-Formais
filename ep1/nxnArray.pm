@@ -131,6 +131,7 @@ sub printFNC{
 		print "$key\n";
 	}
 }
+
 sub subSquare {
     my $self = shift;
     use integer;

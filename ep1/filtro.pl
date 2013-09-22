@@ -3,10 +3,16 @@ use v5.10;
 use strict;
 use warnings;
 
-my @string = split(' ', <>);# nao precisa do aspas
+my $input = $ARGV[0];
+
+open INPUT, "< $input";
+
+my $junk = <INPUT>;
+my @string = split(' ',<INPUT>);
+
 chomp (@string);
 my @string2;
-for (my $a = 0; $a < scalar @string; $a++) {
+for (my $a = 1; $a < scalar @string; $a++) {
 	if(not ($string[$a] =~ /^-[1-9]{1,3}/)){
 		my $item = $string[$a];
 		push (@string2,$item);

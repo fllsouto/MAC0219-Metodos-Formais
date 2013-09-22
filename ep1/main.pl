@@ -35,13 +35,10 @@ $mat->printFNC();
 
 close OUTPUT;
 
-if(`/.minisat $output $answer`){
-	system('./filtro.pl '.$answer);
-}
-else{
-	`minisat $output $answer`;
-	system('./filtro.pl '.$answer);
-};
+
+#caso nao execute, retirar o ./ da linha 40
+`./minisat $output $answer`;
+system('./filtro.pl '.$answer);
 
 
 

@@ -35,7 +35,7 @@ $mat->printFNC();
 
 close OUTPUT;
 
-if(`/.minisat $output $answer`){
+if(`./minisat $output $answer`){
 	system('./filtro.pl '.$answer);
 }
 else{

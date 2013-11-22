@@ -1,49 +1,61 @@
 #!/usr/bin/perl
 
+#Exercicio Programa I - Sudoku
+#MAC0239 - Métodos Formais em Programacao
+#Professor Marcelo Finger
+
+#Fellipe Souto Sampaio 
+#Número USP: 7990422 e-mail: fellipe.sampaio@usp.com
+
+#Gervásio Protásio dos Santos Neto 
+#Número USP: 7990996 e-mail: gervasio.neto@usp.br
+
+#IME-USP
+#2 semestre 2013
+
+
 use v5.10;
 use nxnArray;
 use strict;
 use warnings;
 
-my @string = split(' ', <>);# nao precisa do aspas
+if(@ARGV < 3){
+   die "Uso:\n./main.pl <arquivoDeEntrada> <arquivoCNF>  <arquivoRespota>\n";
+}
 
+my $input = $ARGV[0];
+my $output = $ARGV[1];
+my $answer = $ARGV[2];
+
+open INPUT, "< $input";
+open OUTPUT, "> $output";
+
+my @string = split(' ', <INPUT>);# nao precisa do aspas
+
+close INPUT;
 
 my $mat = new nxnArray();
-print "c Sudoku\nc\np cnf 729 8748\n";
+select OUTPUT;
 $mat->readInput(@string);
-$mat->squareExistence();
+$mat->insertTips();
 $mat->regionExistence();
-$mat->columnExistence();
 $mat->lineExistence();
+$mat->columnExistence();
+$mat->permuteTips();
+$mat->subSquare();
+$mat->highlanderLine();
+$mat->highlanderColumn();
+$mat->printFNC();
 
-$mat->regionUniqueness();
-$mat->lineUniqueness();
-$mat->columnUniqueness();
+close OUTPUT;
 
-
-#####################################################################################
-#####################################################################################
-#####################################################################################
-
-# foreach $a (1..9){
-# 	$mat->createMatrix($a);
-# }
-
-# $mat->pointRmv();
-
-# my $val1 = 0;
-# my $val2 = 1;
-# my $st = join('x', $val1,$val2);
-# my $bye = $mat->retHash($st); 
-# print ">> $bye \n";
-#print "valor : $st\n";
-
-# $mat->horizontalRmv();
-# $mat->verticalRmv();
-# $mat->zoneRmv(1,2);
-# foreach $a (0..9){
-# 	$mat->printMatrix($a);
-# }
+if(`./minisat $output $answer`){
+	system('./filtro.pl '.$answer);
+}
+else{
+	`minisat $output $answer`;
+	system('./filtro.pl '.$answer);
+};
 
 
 

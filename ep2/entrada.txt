@@ -1,6 +1,4 @@
 X: 1 1.
 Y: 14 83.
 potatos(BATATA, CRYSIS) .
-foo(X, Y) -bar(RAINHA, WEE) .
-. X > BATATA + MACACO.
-. Y != PU * LARANJA.
+foo(X,Y) -bar(RAINHA,WEE). X!=Y X>Y X+Y>5.

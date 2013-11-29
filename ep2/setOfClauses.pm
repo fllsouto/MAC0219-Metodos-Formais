@@ -27,6 +27,20 @@ sub addPredicateList{
 	push ($self->{setOfClauses},$newCell);	
 }
 
+sub addVariables{
+	my $self = shift;
+	my $key = shift;
+	my $range = shift;
+	$self->{variables}->{$key} = $range;
+}
+
+sub returnRange{
+	my $self = shift;
+	my $key = shift;
+	$range = $self->{variables}->{$key};
+	return $range;
+}
+
 sub printPredicateList{
 	my $self = shift;
 	my $x = $self->clausesListSize();

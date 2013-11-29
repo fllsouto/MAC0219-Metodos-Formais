@@ -14,7 +14,7 @@ $handle->open("<$input");
 my %variables;
 my %sentences;
 
-my $obejeto = new setOfClauses();
+my $objeto = new setOfClauses();
 while (my $line = <$handle>){
     given($line){
     	# print $line."\n";
@@ -30,9 +30,14 @@ while (my $line = <$handle>){
 	}
 	# when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*?[\)]\s*)+.((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){
     when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*[\)]\s)+.$/){
-		my @listall = $line =~ /(-?[a-z]+[(][A-Z,\s]+[)])+/g;
+		my @predicates = $line =~ /(-?[a-z]+[(][A-Z,\s]+[)])+\s+/g;
+		my $predicatesList = [@predicates];
 		my $foo = ["bar","waka"];
-		$obejeto->addPredicateList(@listall,$foo);
+		# print "HELLO\n  $predicatesList->[1] \n #########";
+		# foreach $a (@listall){ print "$a >>\n";}
+		# my $s = @listall;
+		# print "Before size $s\n";
+		$objeto->addPredicateList($predicatesList,$foo);
 	
 	}
 	# #when($line =~/^[\.]((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){

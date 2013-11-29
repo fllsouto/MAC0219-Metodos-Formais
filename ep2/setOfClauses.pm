@@ -30,13 +30,19 @@ sub addPredicateList{
 sub printPredicateList{
 	my $self = shift;
 	my $x = $self->clausesListSize();
-	listSize($self->{setOfClauses});
-	print "Qnt linhas : $x\n";
+	my $k = $self->predicatesQuantites(3);
+	print "Qnt linhas : $k\n";
 	# for(my $x = 0; $x < $self->clausesListSize; $x++){
 	# 	foreach $a ($self->{setOfClauses}->[$x]){
 	# 		print "#$x - Lista : $a";
 	# 	}
 	# }
+}
+sub predicatesQuantites{
+	my $self = shift;
+	my $index = shift;
+	my $quantitie = listSize($self->{setOfClauses}->[$index]->[0]);
+	return $quantitie;
 }
 
 sub clausesListSize{
@@ -48,7 +54,8 @@ sub clausesListSize{
 
 sub listSize{
 	my $list = shift;
-	print "Lista : \n#####\n $list \n#####\n ";
+	$list = @$list;
+	return $list
 }
 1;
 

@@ -31,16 +31,18 @@ while (my $line = <$handle>){
 
 	# when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*?[\)]\s*)+.((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){
 
-	when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*[\)]\s?)+.$/){
+	when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*[\)]\s?)+.((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){
 	    my @predicates = $line =~ /(-?[a-z]+[(][A-Z,\s]+[)])+\s?/g;
 	    print "Eis o role: @predicates\n";
 	    my $predicatesList = [@predicates];
-	    my $foo = ["bar","waka"];
+	    my @restritores = $line =~ /((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?/g;
+	    print "OLHA AS RESTRICOES: @restritores\n\n";
+	    my $restritoresList = [@restritores];
 	    # print "HELLO\n  $predicatesList->[1] \n #########";
 	    # foreach $a (@listall){ print "$a >>\n";}
 	    # my $s = @listall;
 	    # print "Before size $s\n";
-	    $objeto->addPredicateList($predicatesList,$foo);
+	    $objeto->addPredicateList($predicatesList,$restritoresList);
 	    
 	}
 	# #when($line =~/^[\.]((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){

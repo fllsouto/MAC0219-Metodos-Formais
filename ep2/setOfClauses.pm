@@ -27,10 +27,24 @@ sub addPredicateList{
 	push ($self->{setOfClauses},$newCell);	
 }
 
+sub addVariables{
+	my $self = shift;
+	my $key = shift;
+	my $range = shift;
+	$self->{variables}->{$key} = $range;
+}
+
+sub returnRange{
+	my $self = shift;
+	my $key = shift;
+	$range = $self->{variables}->{$key};
+	return $range;
+}
+
 sub printPredicateList{
 	my $self = shift;
 	my $x = $self->clausesListSize();
-	my $k = $self->predicatesQuantites(3);
+	my $k = $self->predicatesQuantites(5);
 	print "Qnt linhas : $k\n";
 	# for(my $x = 0; $x < $self->clausesListSize; $x++){
 	# 	foreach $a ($self->{setOfClauses}->[$x]){
@@ -41,7 +55,13 @@ sub printPredicateList{
 sub predicatesQuantites{
 	my $self = shift;
 	my $index = shift;
-	my $quantitie = listSize($self->{setOfClauses}->[$index]->[0]);
+	my $quantitie;
+	if (exists $self->{setOfClauses}->[$index]){
+		$quantitie = listSize($self->{setOfClauses}->[$index]->[0]);
+	}
+	else{
+		return 0;
+	}
 	return $quantitie;
 }
 

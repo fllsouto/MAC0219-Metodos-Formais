@@ -28,17 +28,20 @@ while (my $line = <$handle>){
 	    # print "Range : ($2 ~ $3)\n";
 	    # print "-----------------\n";	
 	}
+
 	# when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*?[\)]\s*)+.((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){
-    when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*[\)]\s)+.$/){
-		my @predicates = $line =~ /(-?[a-z]+[(][A-Z,\s]+[)])+\s+/g;
-		my $predicatesList = [@predicates];
-		my $foo = ["bar","waka"];
-		# print "HELLO\n  $predicatesList->[1] \n #########";
-		# foreach $a (@listall){ print "$a >>\n";}
-		# my $s = @listall;
-		# print "Before size $s\n";
-		$objeto->addPredicateList($predicatesList,$foo);
-	
+
+	when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*[\)]\s?)+.$/){
+	    my @predicates = $line =~ /(-?[a-z]+[(][A-Z,\s]+[)])+\s?/g;
+	    print "Eis o role: @predicates\n";
+	    my $predicatesList = [@predicates];
+	    my $foo = ["bar","waka"];
+	    # print "HELLO\n  $predicatesList->[1] \n #########";
+	    # foreach $a (@listall){ print "$a >>\n";}
+	    # my $s = @listall;
+	    # print "Before size $s\n";
+	    $objeto->addPredicateList($predicatesList,$foo);
+	    
 	}
 	# #when($line =~/^[\.]((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){
 	default{
@@ -49,7 +52,7 @@ while (my $line = <$handle>){
     }
 }
 
-$objeto->printPredicateList();
+#$objeto->printPredicateList();
 
 $handle->close;
 

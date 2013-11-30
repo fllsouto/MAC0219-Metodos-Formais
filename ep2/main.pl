@@ -11,8 +11,8 @@ my $input = $ARGV[0];
 my $handle = FileHandle->new;
 $handle->open("<$input");
 
-my %variables;
-my %sentences;
+$, = " ;;;; ";
+$" = " ::: ";
 
 my $objeto = new setOfClauses();
 while (my $line = <$handle>){
@@ -21,27 +21,35 @@ while (my $line = <$handle>){
 	when($line =~ /^([A-Z]+):\s([0-9]+)\s([0-9]+).$/){
 	    my $variavelCapturada = $1; #identifica o nome da variavel
 	    my $rangeList = [$2, $3]; #cria uma (referencia para) lista com o range da variavel
-	    $variables{$variavelCapturada} = $rangeList; #associa a variavel a seu range
-	    # print "----Variavel----\n";
-	    # print "Texto :" .$line ."\n";
-	    # print "Variavel : $1\n";
-	    # print "Range : ($2 ~ $3)\n";
-	    # print "-----------------\n";	
+	    $objeto->addVariables($variavelCapturada, $rangeList); #associa a variavel a seu range
+
+	    #### PRINTS PARA DEBUG #########
+	    # print "----Variavel----\n";  #
+	    # print "Texto :" .$line ."\n";#
+	    # print "Variavel : $1\n";     #
+	    # print "Range : ($2 ~ $3)\n"; #
+	    # print "-----------------\n"; #	
 	}
 
 	# when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*?[\)]\s*)+.((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){
 
-	when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*[\)]\s?)+.((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?$/){
+	when($line =~ /^(-?[a-z]+[\(]([A-Z]+)(,\s*([A-Z]+))*[\)]\s?)+./){
+
 	    my @predicates = $line =~ /(-?[a-z]+[(][A-Z,\s]+[)])+\s?/g;
-	    print "Eis o role: @predicates\n";
 	    my $predicatesList = [@predicates];
-	    my @restritores = $line =~ /((\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*\s(<|>|>=|<=|==|!=)\s([A-Z]+)(\s(\+|\-|\*|\/)\s[A-Z]+)*)*[\.])?/g;
-	    print "OLHA AS RESTRICOES: @restritores\n\n";
-	    my $restritoresList = [@restritores];
-	    # print "HELLO\n  $predicatesList->[1] \n #########";
-	    # foreach $a (@listall){ print "$a >>\n";}
-	    # my $s = @listall;
-	    # print "Before size $s\n";
+	    
+	    my @auxiliar = split(/\./, $line); #separa predicados de restritores, visto que esses sao separados por ponto
+	    my @restritores = split(",", $auxiliar[1]); #cria um vetor em que cada elemento eh uma restricao do predicado
+	    my $restritoresList = [@restritores]; #cria um escalar que contem a lista de restritores
+	    
+	    ### PRINTS DE DEBUG ##############
+	    #print "LINHA: $line";           #
+	    #print "PREDICADOS: @predicates";#
+	    #print "\nRESTRITORES:";         #
+	    #print @restritores;             #
+
+
+
 	    $objeto->addPredicateList($predicatesList,$restritoresList);
 	    
 	}

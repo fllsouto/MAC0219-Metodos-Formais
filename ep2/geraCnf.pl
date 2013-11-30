@@ -9,13 +9,20 @@ use setOfClauses;
 $, = " ;;; \n";
 $" = " ,,, ";
 
+if(@ARGV < 2){
+    die "USO: ./geraCnf.pl <entrada> <saida>";
+}
+
 my $entrada = shift;
+my $saida = shift;
 my %hash;
 my $count = 1;
 
 open INPUT, "< $entrada";
+open OUTPUT, "> $saida";
 
 my @lines = <INPUT>;
+close INPUT;
 
 for(@lines){
     chomp; #remove o newline (\n)
@@ -51,20 +58,29 @@ for(@lines){
 	    }
 	}
     }
-
-    print "Separado: @clausulas";
-    print "\n\n";
+    
+   ####### PRINTS DE DEBUG ########
+   # print "Separado: @clausulas";#
+   # print "\n\n";                #
 }
 
-print "Hash maroto das gatinhas: \n";
-foreach my $aux (keys %hash){
-    print "$aux ------> $hash{$aux}\n";
-}
+####### PRINTS DE DEBUG #################
+#print "Hash maroto das gatinhas: \n";  #
+#foreach my $aux (keys %hash){          #   
+#    print "$aux ------> $hash{$aux}\n";#
+#}
 
-print "Numero de clausulas: $.";
 my $numClauses = $.;
-
-print "REDO:";
+my $numVars = 0;
+foreach my $a (keys %hash){
+    if (abs($hash{$a}) > $numVars){
+	$numVars = abs($hash{$a});
+    }
+}
+select OUTPUT;
+print "c Versao cnf de $entrada\n";
+print "c\n";
+print "p cnf $numVars $numClauses\n";
 
 for(@lines){
     my @clausulas = split(/\) /); #separa cada um dos termos do predicado

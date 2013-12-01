@@ -49,19 +49,55 @@ sub writeClauses{
 		my $restritor = takeRestritorList($clausuresList);
 
 		if ($restritor->[0] eq "null"){
-			# printingPredicatesNotLimited($predicate);
-			writingPredicatesNotLimited($predicate);
+			# $self->printingPredicatesNotLimited($predicate);
+			$self->writingPredicatesNotLimited($predicate);
 		}
 		else{
 		}
 	}
 }
-
+sub getZeroVector{
+	my $size = shift;
+	my @vector;
+	for (my $x = 0; $x < $size; $x++) {
+		$vector[$x] = 0;
+	}
+	return @vector;
+}
 sub writingPredicatesNotLimited{
+	my $self = shift;
+	my $predicate = shift;
+	my @variablesList = (returnVariablesList($predicate));
 	$, = " ;;;; ";
 	$" = " ::: ";
+	# print ">"x30 ."\n";
+	# print "XX#List : @variablesList   <<! \n\n";
+	# print "<"x30 ."\n";
+
+	foreach my $x (@variablesList) {
+		print ">< $x \n";
+	}
+	print "\n\n";
+
+	my @out = map { $self->getMinimumRange($_) } @variablesList;
+	foreach my $x (@out) {
+		print ">>> $x \n";
+	}
+	print "\n\n";
+}
+
+sub getMinimumRange{
+	my $self = shift;
+	my $key = shift;
+	print "Key : $key\n";
+	my @chaves = keys $self->{variables};
+	print "Chaves : @chaves   \n";
+	print "FOO : $self->{variables}\n";
+	return 0;
+}
+
+sub returnVariablesList{
 	my $predicate = shift;
-	print ">"x30 ."\n";
 	my $str = "";
 	my %hash;
 	for (my $x = 0; $x < listSize($predicate); $x++) {
@@ -72,12 +108,12 @@ sub writingPredicatesNotLimited{
 		$hash{$1} = 1;
 	}
 	my @variables = $str =~ /([A-Z]+)/g;
-	my @key = keys %hash;
-	print "#List : @key   <<! \n\n";
-	print "<"x30 ."\n";
+	my @keyList = keys %hash;
+	return @keyList;
 }
 
 sub printingPredicatesNotLimited{
+	my $self = shift;
 	my $predicate = shift;
 	print ">"x30 ."\n";
 	for (my $x = 0; $x < listSize($predicate); $x++) {

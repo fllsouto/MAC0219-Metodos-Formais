@@ -69,5 +69,7 @@ while (my $line = <$handle>){
 # $objeto->printVariablesList();
 # $objeto->printClausesList();
 $objeto->writeClauses();
+
+$objeto->showInstances();
 $handle->close;
 

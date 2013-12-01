@@ -65,31 +65,72 @@ sub getZeroVector{
 	return @vector;
 }
 sub writingPredicatesNotLimited{
-	my $self = shift;
-	my $predicate = shift;
-	my @variablesList = (returnVariablesList($predicate));
+	
 	$, = " ;;;; ";
 	$" = " ::: ";
+
+	my $self = shift;
+	my $predicate = shift;
+	my @variablesList = returnVariablesList($predicate);
+	my $size = @variablesList;
+	my @vec = getZeroVector($size);
+	my @lowRange = map { $self->getMinimumRange($_) } @variablesList;
+	my @highRange = map { $self->getMaximumRange($_) } @variablesList;
+	# print "TAM : $size \n";
 	# print ">"x30 ."\n";
 	# print "XX#List : @variablesList   <<! \n\n";
 	# print "<"x30 ."\n";
-
+	print "><"x30 . "\n";
 	foreach my $x (@variablesList) {
-		print ">< $x \n";
+		print "L> $x == " . $self->getMinimumRange($x) . " \n";
 	}
-	print "\n\n";
+	print "><"x30 . "\n";
+	incrementVector(\@vec,1);
+	my @mergedVector = mergeVectors(\@vec,\@lowRange);
+	foreach my $x (@mergedVector) {
+		print "M> $x \n";
+	}
+	incrementVector(\@vec,0);
 
-	my @out = map { $self->getMinimumRange($_) } @variablesList;
-	foreach my $x (@out) {
-		print ">>> $x \n";
+	@mergedVector = mergeVectors(\@vec,\@lowRange);
+	foreach my $x (@mergedVector) {
+		print "M> $x \n";
 	}
-	print "\n\n";
+
+	print ">#"x30 . "\n";
+
+}
+
+sub mergeVectors{
+	my $vector1 = shift;
+	my $vector2 = shift;
+	my $size = listSize($vector1);
+	my @newVector;
+	for (my $x = 0; $x < $size; $x++) {
+		$newVector[$x] = @$vector1[$x] + @$vector2[$x];
+	}
+	return @newVector;
+}
+# incrementVector(\@vec,0); Forma de chamar!
+sub incrementVector{
+	my $vector = shift;
+	my $size = listSize($vector);
+	my $indx = shift;
+	if ($indx < $size){
+		@$vector[$indx]++;
+	}
 }
 
 sub getMinimumRange{
 	my $self = shift;
 	my $key = shift;
 	return $self->{variables}->{$key}->[0];
+}
+
+sub getMaximumRange{
+	my $self = shift;
+	my $key = shift;
+	return $self->{variables}->{$key}->[1];
 }
 
 sub returnVariablesList{
@@ -105,7 +146,8 @@ sub returnVariablesList{
 	}
 	my @variables = $str =~ /([A-Z]+)/g;
 	my @keyList = keys %hash;
-	return @keyList;
+	return  @keyList;
+	 
 }
 
 sub printingPredicatesNotLimited{

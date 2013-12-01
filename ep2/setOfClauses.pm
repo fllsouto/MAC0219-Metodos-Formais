@@ -103,86 +103,52 @@ sub writingPredicatesNotLimited{
 	my $clause = returnFullClause($predicate);
 
 	my $instance ;
-	print "\n" ."<>"x20 ."\n";
-	print "VARIABLES : @variablesList \n";
-	my $x = 0;
-	my $pos =  0;
+	# print "\n" ."<>"x20 ."\n";
+	# print "VARIABLES : @variablesList\n";
+	my $count =  1;
+	my $pos = 0;
 	my $pointer = 0;
-	# while(1){
+	while(1){
 		while(1) {
-			# print "#$x | @mergedVector\n";
-			my @tempVector = mergeVectors(\@vec,\@lowRange);
-			$instance = writePredicate($clause, \@variablesList, \@tempVector);
-			# print "Clausure :: $instance \n";
-			# print "VEC :> @vec \n-------------------------\n";
-			# print "VEC_TMP :> @tempVector \n\n\n";
-			if(!incrementVector(\@vec,\@lowRange,\@highRange,$pos)){ last; }
-			$x++;
+				# print "#$x | @mergedVector\n";
+				my @tempVector = mergeVectors(\@vec,\@lowRange);
+				$instance = writePredicate($clause, \@variablesList, \@tempVector);
+				# print "\n#$count -- Clausure :: $instance \n";
+				# print "@vec \n";
+				print "$instance \n";
+				$count++;
+				# print "VEC :> @vec \n-------------------------\n";
+				# print "VEC_TMP :> @tempVector \n\n\n";
+				if(!incrementVector(\@vec,\@lowRange,\@highRange,$pos)){ 
+					# print "\nEND -- Clausure :: $instance \n";
+					# print "\n";
+					last; }
+			}
+		my $way = askIfPossible(\@vec,\@lowRange,\@highRange,$pointer);
+		my $searchLvl;
+		if($way > -1){
+			$searchLvl = $way;
 		}
-	my $searchLvl = askIfPossible(\@vec,\@lowRange,\@highRange,++$pointer);
-	if ($searchLvl > -1){
-		print "Has Sucess :: $pointer ... $searchLvl\n";
-		print "B - VEC :> @vec \n-------------------------\n";
-		my $res = incrementVector(\@vec,\@lowRange,\@highRange,$searchLvl);
-		print "A - VEC :> @vec \n-------------------------\n";
-		resetSubGroups(\@vec,$searchLvl);
-		print "AAA - VEC :> @vec \n-------------------------\n";
+		else{ 
+			$searchLvl = askIfPossible(\@vec,\@lowRange,\@highRange,$pointer++); 
+		}
+		if ($searchLvl > -1){
+			incrementVector(\@vec,\@lowRange,\@highRange,$searchLvl);
+			resetSubGroups(\@vec,$searchLvl);
+			# print "Pointer VALUE : $pointer \n";
+		}
+		else{ last; }
 	}
-	else{ print "Hasnt Sucess :: $pointer .,,. $searchLvl\n"; }
 		
-	print "#END | @vec\n";
-
-
-
-	# foreach my $x (@mergedVector) {
-	# 	print "MV>< $x \n";
-	# }
-	# print "\n";
-	# my $answer = incrementVector(\@mergedVector,\@highRange,2);
-
-	# foreach my $x (@mergedVector) {
-	# 	print "AFTER - MV>< $x \n";
-	# }
-	# print "\n ###############\n";
-
-	# $answer = incrementVector(\@mergedVector,\@highRange,2);
-
-	# foreach my $x (@mergedVector) {
-	# 	print "AFTER - MV>< $x \n";
-	# }
-	# print "\n";
-
-	# print "TAM : $size \n";
-	# print ">"x30 ."\n";
-	# print "XX#List : @variablesList   <<! \n\n";
-	# print "<"x30 ."\n";
-	
-	# print "><"x30 . "\n";
-	# foreach my $x (@variablesList) {
-	# 	print "L> $x == " . $self->getMinimumRange($x) . " \n";
-	# }
-	# print "><"x30 . "\n";
-	# my $answer = incrementVector(\@vec,\@lowRange,\@highRange,1);
-	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
-	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
-	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
-	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
-	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
-	# @mergedVector = mergeVectors(\@vec,\@lowRange);
-	# print "\n";
-	# foreach my $x (@mergedVector) {
-	# 	print "M> $x \n";
-	# }
-
-	# print ">#"x30 . "\n";
 }
 
+# resetSubGroups(\@vec,$searchLvl);
 sub resetSubGroups{
 	# print "Hello World! \n";
 	my $vector = shift;
 	my $limit = shift;
-	print "vector : @$vector \n";
-	print "LIMIT : $limit \n";
+	# print "vector : @$vector \n";
+	# print "LIMIT : $limit \n";
 	for (my $x = 0; $x < $limit; $x++) {
 		@$vector[$x] = 0;
 	}
@@ -204,14 +170,15 @@ sub askIfPossible{
 	my $highRange = shift;
 	my $indx = shift;
 	my $size = listSize($vector);
-
+	# print "Here!! \n";
 	# print "><"x 30 . "\n";
-	# print "VECTOR :> @$vector \n";
-	# print "LOW :> @$lowRange \n";
-	# print "HIGH :> @$highRange \n";
+	# print "V :> @$vector \n";
+	# print "L :> @$lowRange \n";
+	# print "H :> @$highRange \n";
 	# print "INDX : $indx --- SIZE : $size\n";
 	# print "><"x 30 . "\n";
 	if ($indx < $size){
+		# print "DEX -- @$vector[$indx] -- @$highRange[$indx] \n";
 		my $temp = @$vector[$indx] + @$lowRange[$indx];
 		if($temp < @$highRange[$indx]){
 			# print "YES Vec: $temp -- @$vector[$indx] -- @$highRange[$indx] \n";
@@ -219,13 +186,13 @@ sub askIfPossible{
 		}
 		else{
 			# print "NOT Vec: $temp -- @$vector[$indx] -- @$highRange[$indx] \n";
-			# # print "RET - 0\n";
+			# print "RET - 0\n";
 			# return 0;
 			askIfPossible($vector,$lowRange,$highRange,++$indx);
 		}
 	}
 	else{
-		print "HERE \n";
+		# print "HERE2! \n";
 		return -1;
 	}
 }
@@ -240,8 +207,8 @@ sub incrementVector{
 
 
 	if ($indx < $size){
-		# print "Vec : @$vector[$indx] -- @$highRange[$indx] \n";
 		my $temp = @$vector[$indx] + @$lowRange[$indx];
+		# print "WAKA Vec: $temp -- @$vector[$indx] -- @$highRange[$indx] \n\n";
 		if($temp < @$highRange[$indx]){
 			@$vector[$indx]++;
 			return 1;
@@ -272,6 +239,7 @@ sub returnFullClause{
 	for (my $x = 0; $x < listSize($predicate); $x++) {
 		$str = $str . " " . $predicate->[$x];
 	}
+	$str = $str . ".";
 	return  $str;
 	
 }

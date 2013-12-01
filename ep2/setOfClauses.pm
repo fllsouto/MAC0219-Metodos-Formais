@@ -89,11 +89,7 @@ sub writingPredicatesNotLimited{
 sub getMinimumRange{
 	my $self = shift;
 	my $key = shift;
-	print "Key : $key\n";
-	my @chaves = keys $self->{variables};
-	print "Chaves : @chaves   \n";
-	print "FOO : $self->{variables}\n";
-	return 0;
+	return $self->{variables}->{$key}->[0];
 }
 
 sub returnVariablesList{

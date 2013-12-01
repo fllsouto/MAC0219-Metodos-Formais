@@ -37,18 +37,23 @@ while (my $line = <$handle>){
 
 	    my @predicates = $line =~ /(-?[a-z]+[(][A-Z,\s]+[)])+\s?/g;
 	    my $predicatesList = [@predicates];
-	    
+	    chomp ($line);
 	    my @auxiliar = split(/\./, $line); #separa predicados de restritores, visto que esses sao separados por ponto
-	    my @restritores = split(",", $auxiliar[1]); #cria um vetor em que cada elemento eh uma restricao do predicado
+	    my @restritores;
+	    if (exists $auxiliar[1]){
+	    	@restritores = split(",", $auxiliar[1]); #cria um vetor em que cada elemento eh uma restricao do predicado
+	    }
+	    else{
+	    	@restritores = "null";
+	    }
 	    my $restritoresList = [@restritores]; #cria um escalar que contem a lista de restritores
 	    
 	    ### PRINTS DE DEBUG ##############
-	    #print "LINHA: $line";           #
-	    #print "PREDICADOS: @predicates";#
-	    #print "\nRESTRITORES:";         #
-	    #print @restritores;             #
-
-
+	    # print "LINHA: $line \n\n";           #
+	    # # print "AUX: @auxiliar \n\n";           #
+	    # print "PREDICADOS: @predicates \n\n";#
+	    # print "RESTRITORES: @restritores.\n";         #
+	    # print "><"x30 . "\n";         #
 
 	    $objeto->addPredicateList($predicatesList,$restritoresList);
 	    
@@ -61,8 +66,8 @@ while (my $line = <$handle>){
 	}
     }
 }
-
-#$objeto->printPredicateList();
-
+# $objeto->printVariablesList();
+# $objeto->printClausesList();
+$objeto->writeClauses();
 $handle->close;
 

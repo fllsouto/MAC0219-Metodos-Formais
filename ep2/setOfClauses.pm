@@ -76,30 +76,51 @@ sub writingPredicatesNotLimited{
 	my @vec = getZeroVector($size);
 	my @lowRange = map { $self->getMinimumRange($_) } @variablesList;
 	my @highRange = map { $self->getMaximumRange($_) } @variablesList;
+	my @mergedVector = mergeVectors(\@vec,\@lowRange);
+	foreach my $x (@mergedVector) {
+		print "MV>< $x \n";
+	}
+	print "\n";
+	my $answer = incrementVector(\@mergedVector,\@highRange,2);
+
+	foreach my $x (@mergedVector) {
+		print "AFTER - MV>< $x \n";
+	}
+	print "\n ###############\n";
+
+	$answer = incrementVector(\@mergedVector,\@highRange,2);
+
+	foreach my $x (@mergedVector) {
+		print "AFTER - MV>< $x \n";
+	}
+	print "\n";
+
 	# print "TAM : $size \n";
 	# print ">"x30 ."\n";
 	# print "XX#List : @variablesList   <<! \n\n";
 	# print "<"x30 ."\n";
-	print "><"x30 . "\n";
-	foreach my $x (@variablesList) {
-		print "L> $x == " . $self->getMinimumRange($x) . " \n";
-	}
-	print "><"x30 . "\n";
-	incrementVector(\@vec,1);
-	my @mergedVector = mergeVectors(\@vec,\@lowRange);
-	foreach my $x (@mergedVector) {
-		print "M> $x \n";
-	}
-	incrementVector(\@vec,0);
+	
+	# print "><"x30 . "\n";
+	# foreach my $x (@variablesList) {
+	# 	print "L> $x == " . $self->getMinimumRange($x) . " \n";
+	# }
+	# print "><"x30 . "\n";
+	# my $answer = incrementVector(\@vec,\@lowRange,\@highRange,1);
+	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
+	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
+	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
+	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
+	# $answer = incrementVector(\@vec,\@lowRange,\@highRange,2);
+	# @mergedVector = mergeVectors(\@vec,\@lowRange);
+	# print "\n";
+	# foreach my $x (@mergedVector) {
+	# 	print "M> $x \n";
+	# }
 
-	@mergedVector = mergeVectors(\@vec,\@lowRange);
-	foreach my $x (@mergedVector) {
-		print "M> $x \n";
-	}
-
-	print ">#"x30 . "\n";
-
+	# print ">#"x30 . "\n";
 }
+
+
 
 sub mergeVectors{
 	my $vector1 = shift;
@@ -114,10 +135,21 @@ sub mergeVectors{
 # incrementVector(\@vec,0); Forma de chamar!
 sub incrementVector{
 	my $vector = shift;
+	my $highRange = shift;
 	my $size = listSize($vector);
 	my $indx = shift;
+
+
 	if ($indx < $size){
-		@$vector[$indx]++;
+		print "Vec : @$vector[$indx] -- @$highRange[$indx] \n";
+		if(@$vector[$indx] < @$highRange[$indx]){
+			@$vector[$indx]++;
+			return 1;
+		}
+		else{
+			print "RET - 0\n";
+			return 0;
+		}
 	}
 }
 

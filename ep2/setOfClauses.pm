@@ -39,7 +39,7 @@ sub returnRange{
     return $range;
 }
 
-sub writeClauses{
+sub writeClauses{ #Escreve as clausulas limitadas ou nao
     my $self = shift;
     for (my $x = 0; $x < $self->clausesListSize(); $x++) {
 	my $clausuresList = $self->takeClausureList($x);
@@ -56,9 +56,6 @@ sub writeClauses{
 }
 
 sub writingPredicatesLimited{
-
-    $, = " ;;;; ";
-    $" = " ::: ";
 
     my $self = shift;
     my $predicate = shift;
@@ -125,24 +122,24 @@ sub writingPredicatesNotLimited{
     my $clause = returnFullClause($predicate);
 
     while(1){
-	while(1) {
-	    my @tempVector = mergeVectors(\@vec,\@lowRange);
-	    $instance = writePredicate($clause, \@variablesList, \@tempVector);
-	    $self->{instantiatedClauses}->{$instance} = 1;
-	    if(!incrementVector(\@vec,\@lowRange,\@highRange,0)){ last; }
-	}
-	$decision = askIfPossible(\@vec,\@lowRange,\@highRange,$pointer);
-	if($decision > -1){
-	    $searchLvl = $decision;
-	}
-	else{ 
-	    $searchLvl = askIfPossible(\@vec,\@lowRange,\@highRange,$pointer++); 
-	}
-	if ($searchLvl > -1){
-	    incrementVector(\@vec,\@lowRange,\@highRange,$searchLvl);
-	    resetSubGroups(\@vec,$searchLvl);
-	}
-	else{ last; }
+    	while(1) {
+    	    my @tempVector = mergeVectors(\@vec,\@lowRange);
+    	    $instance = writePredicate($clause, \@variablesList, \@tempVector);
+    	    $self->{instantiatedClauses}->{$instance} = 1;
+    	    if(!incrementVector(\@vec,\@lowRange,\@highRange,0)){ last; }
+    	}
+    	$decision = askIfPossible(\@vec,\@lowRange,\@highRange,$pointer);
+    	if($decision > -1){
+    	    $searchLvl = $decision;
+    	}
+    	else{ 
+    	    $searchLvl = askIfPossible(\@vec,\@lowRange,\@highRange,$pointer++); 
+    	}
+    	if ($searchLvl > -1){
+    	    incrementVector(\@vec,\@lowRange,\@highRange,$searchLvl);
+    	    resetSubGroups(\@vec,$searchLvl);
+    	}
+    	else{ last; }
     }
     
 }
@@ -301,9 +298,9 @@ sub returnVariablesList{
 	$str = $str . " " . $predicate->[$x];
     }
     while ($str =~ /([A-Z]+)/g){
-	$hash{$1} = 1;
+    	$hash{$1} = 1;
     }
-    my @variables = $str =~ /([A-Z]+)/g;
+    my @variables = $str =~ /([A-Z]+)/g; #TOSEE
     my @keyList = keys %hash;
     return  @keyList;
     

@@ -106,7 +106,31 @@ essa substituição é realizada iterando dentro de @variablesList com o método
 
 essa string instanciada é guardada em um hash como uma key. Em seguida usa-se o método \textit{incrementVector}, nesse método incrementamos o vetor @vec em uma unidade em uma dada posição, no nosso caso seria 
 \begin{verbatim} @vec = [1,0,0,0] \end{verbatim}
-nesse ponto reside um dos grandes truques do algoritmo, antes de somar um elemento no vetor @vec verificamos se o
+nesse ponto reside um dos grandes truques do algoritmo, antes de somar um elemento no vetor @vec verificamos se a próxima chamada de \textit{incrementVector} pode ser feita sem que o valor nas céluals exceda o limite do @highRange. No nosso caso verificamos se  
+\begin{verbatim} $vec[0] + $lowRange[0] < $highRange[0]\end{verbatim}
+
+respeita essa expressão, no caso positivo o algoritmo repete o laço interno outra vez, caso contrario temos novos passos. Primeiro utilizamos o método \textit{askIfPossible}, que semelhante a \textit{incrementVector} testa se uma soma respeita a expressão anteriormente mencionada, entretanto caso a soma não possa ser realizada, como por exemplo
+
+\begin{verbatim} 
+@vec = [2,0,0,0] 
+$vec[0] + $lowRange[0] < $highRange[0]
+2 + 1 < 3
+\end{verbatim}
+seria falso, portanto chamamos o método \textit{askIfPossible} para o indice seguinte (no caso 1) e testamos a mesma coisa
+
+\begin{verbatim} 
+@vec = [2,0,0,0] 
+$vec[1] + $lowRange[1] < $highRange[1]
+0 + 1 < 2
+\end{verbatim}
+neste caso somamos 1 a posição de indice 1 obtendo
+\begin{verbatim} 
+@vec = [2,1,0,0] 
+\end{verbatim}
+
+
+
+
 
 \section{Geração do CNF}
 Para gerar o arquivo .cnf usamos um arquivo previamente gerado que contém as fórmulas já "traduziadas" para LPO.\\\\

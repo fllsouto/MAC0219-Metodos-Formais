@@ -7,7 +7,7 @@ use warnings;
 use setOfClauses;
 
 $, = " ;;; \n";
-$" = " ,,, ";
+$" = ",,,";
 
 if(@ARGV < 2){
     die "USO: ./geraCnf.pl <entrada> <saida>";
@@ -60,9 +60,9 @@ for(@lines){
 	}
     }
     
-   ####### PRINTS DE DEBUG ########
-   # print "Separado: @clausulas";#
-   # print "\n\n";                #
+    ####### PRINTS DE DEBUG ########
+    # print "Separado: @clausulas";#
+    # print "\n\n";                #
 }
 
 ####### PRINTS DE DEBUG #################
